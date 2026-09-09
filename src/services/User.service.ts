@@ -1,7 +1,7 @@
 import { UserResponseDto } from '../dtos/UserResponse.dto';
-import { User } from '../entities/User.entity';
 import { NotFoundError } from '../utils/errors/AppError';
 import { userRepository } from '../repositories/User.repository';
+import { mapUserToResponseDto } from './mappers/User.mapper';
 
 export class UserService {
   private readonly userRepo = userRepository;
@@ -11,17 +11,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundError('Usuário autenticado não encontrado.');
     }
-    return UserService.mapToResponse(user);
-  }
-
-  private static mapToResponse(user: User): UserResponseDto {
-    return {
-      id: user.id,
-      nome: user.nome,
-      email: user.email,
-      role: user.role,
-      createdAt: user.createdAt,
-    };
+    return mapUserToResponseDto(user);
   }
 }
 

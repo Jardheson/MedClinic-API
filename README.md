@@ -122,40 +122,50 @@ Descrição de cada variável:
 
 ### 3. Migrations / Criação da Tabela
 
-Esta entrega utiliza TypeORM com as seguintes estratégias (funciona em qualquer ordem):
+Esta entrega disponibiliza **DUAS formas independentes** de criar a estrutura do banco (escolha uma, ou use as duas para validar):
 
-- **Desenvolvimento**: `synchronize: true` quando `NODE_ENV !== 'production'` — as tabelas são criadas/atualizadas automaticamente ao iniciar a API.
-- **Produção / Avaliação**: migrations disponíveis para serem rodadas explicitamente.
+#### Opção A) Script SQL manual (mais simples, recomendado para avaliadores que não querem rodar CLI)
 
-Para rodar as migrations (modo manual recomendado na avaliação):
+Um arquivo **pronto para executar** está disponível em:
+
+```
+migrations/001_create_users_table.sql
+```
+
+Para rodar via terminal `psql`:
 
 ```bash
-# Gerar migration inicial (se necessário)
-npm run migration:generate
+psql -U postgres -d medclinic -f migrations/001_create_users_table.sql
+```
 
-# Executar migrations pendentes
+Ou execute o conteúdo do arquivo diretamente no pgAdmin/DBeaver. Ele cria: extensão `uuid-ossp`, tipo `user_role`, tabela `users` (PK UUID, UNIQUE email), índices.
+
+#### Opção B) Migrations TypeORM (via CLI)
+
+As migrations do TypeORM estão em:
+
+```
+src/database/migrations/1720000000001-MedClinicInit.ts
+```
+
+Comandos:
+
+```bash
+# Executar migrations pendentes (cria a estrutura)
 npm run migration:run
 
 # Reverter a última migration (se errar algo)
 npm run migration:revert
+
+# Gerar migration NOVA automaticamente a partir das entities (só se alterar entity)
+npm run migration:generate
 ```
 
-**Atenção:** Se preferir, você também pode criar a tabela manualmente com o SQL abaixo:
+#### Opção C) Dev rápido (apenas ambiente dev)
 
-```sql
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+Em `NODE_ENV=development` o `synchronize: true` do TypeORM **cria a tabela automaticamente** ao iniciar a API (não usar em produção).
 
-CREATE TYPE user_role AS ENUM ('administrador', 'atendente');
 
-CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nome VARCHAR(150) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL,
-    role user_role NOT NULL DEFAULT 'atendente',
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-```
 
 ---
 
@@ -254,6 +264,8 @@ O retorno percorre as mesmas camadas de forma coerente até chegar ao cliente.
 
 ```
 MedClinic-API/
+├── migrations/                         # SCRIPTS SQL MANUAIS (pasta na raiz, conforme seção 26)
+│   └── 001_create_users_table.sql      # Script PostgreSQL 100% pronto: cria enum, tabela, PK, UNIQUE, índices
 ├── src/
 │   ├── @types/
 │   │   └── express/
@@ -263,7 +275,8 @@ MedClinic-API/
 │   │   ├── Auth.controller.ts
 │   │   └── User.controller.ts
 │   ├── database/
-│   │   ├── migrations/                 # (geradas pelo TypeORM CLI)
+│   │   ├── migrations/                 # MIGRATIONS TYPEORM (CLI)
+│   │   │   └── 1720000000001-MedClinicInit.ts  # Equivalente ao script SQL (Opção B)
 │   │   ├── data-source.ts              # DataSource do TypeORM
 │   │   └── index.ts                    # connectDatabase()
 │   ├── dtos/
@@ -287,13 +300,15 @@ MedClinic-API/
 │   │   ├── index.ts                    # Agrupa todas as rotas
 │   │   └── user.routes.ts
 │   ├── services/
+│   │   ├── mappers/
+│   │   │   └── User.mapper.ts          # Conversão Entity → DTO (reutilização, evita duplicação)
 │   │   ├── Auth.service.ts
 │   │   └── User.service.ts
 │   ├── utils/
 │   │   ├── errors/
 │   │   │   └── AppError.ts             # Hierarquia de erros
 │   │   ├── hashPassword.ts             # bcrypt
-│   │   ├── jwt.ts                      # sign + verify
+│   │   ├── jwt.ts                      # sign + verify (trata TokenExpiredError)
 │   │   └── validateEnv.ts              # Zod schema de env
 │   ├── app.ts                          # Express setup
 │   └── server.ts                       # Bootstrap (entrypoint)

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { Secret, sign, SignOptions, verify } from 'jsonwebtoken';
+import { Secret, sign, SignOptions, TokenExpiredError, JsonWebTokenError, verify } from 'jsonwebtoken';
 import { UserRole } from '../entities/UserRole.enum';
 import { UnauthorizedError } from './errors/AppError';
 
@@ -23,7 +23,13 @@ export function verifyAccessToken(token: string): TokenPayload {
   try {
     const decoded = verify(token, JWT_SECRET) as TokenPayload;
     return decoded;
-  } catch {
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw new UnauthorizedError('Token expirado. Realize um novo login.');
+    }
+    if (error instanceof JsonWebTokenError) {
+      throw new UnauthorizedError('Token inválido.');
+    }
     throw new UnauthorizedError('Token inválido ou expirado.');
   }
 }
