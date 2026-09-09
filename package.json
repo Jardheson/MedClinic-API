@@ -22,7 +22,7 @@
     "jwt",
     "rbac"
   ],
-  "author": "MedClinic",
+  "author": "Jardheson Oliveira",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
