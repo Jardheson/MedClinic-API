@@ -687,6 +687,4 @@ Siga este roteiro (seção 37 do MASTER PROMPT) para apresentar o projeto no ví
 **Jardheson Oliveira**  
 MedClinic API — Mini-Projeto Final Avaliativo (Módulo 02 / Semana 07) — Etapa 1: Autenticação e Autorização.
 
----
 
-**Divirta-se construindo!** 
