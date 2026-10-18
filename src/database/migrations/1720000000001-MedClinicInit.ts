@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class MedClinicInit1720000000001 implements MigrationInterface {
   name = 'MedClinicInit1720000000001';
@@ -6,7 +6,7 @@ export class MedClinicInit1720000000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
     await queryRunner.query(
-      `DO $$ BEGIN CREATE TYPE user_role AS ENUM ('administrador', 'atendente'); EXCEPTION WHEN duplicate_object THEN NULL; END $$`,
+      `DO $$ BEGIN CREATE TYPE user_role AS ENUM ('admin', 'secretary'); EXCEPTION WHEN duplicate_object THEN NULL; END $$`,
     );
     await queryRunner.query(
       `CREATE TABLE "users" (
@@ -14,7 +14,7 @@ export class MedClinicInit1720000000001 implements MigrationInterface {
         "nome" character varying(150) NOT NULL,
         "email" character varying(150) NOT NULL,
         "senha" character varying(255) NOT NULL,
-        "role" user_role NOT NULL DEFAULT 'atendente',
+        "role" user_role NOT NULL DEFAULT 'secretary',
         "created_at" TIMESTAMP NOT NULL DEFAULT now(),
         CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")
       )`,

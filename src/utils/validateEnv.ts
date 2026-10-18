@@ -1,6 +1,11 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
+const requiredString = (name: string) =>
+  z
+    .string({ required_error: `${name} é obrigatório.` })
+    .min(1, `${name} é obrigatório.`);
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
@@ -10,16 +15,19 @@ const envSchema = z.object({
     .default('3000')
     .transform((val) => Number(val))
     .pipe(z.number().int().positive()),
-  DB_HOST: z.string().min(1, 'DB_HOST é obrigatório.'),
+  DB_HOST: requiredString('DB_HOST'),
   DB_PORT: z
     .string()
     .default('5432')
     .transform((val) => Number(val))
     .pipe(z.number().int().positive()),
-  DB_USER: z.string().min(1, 'DB_USER é obrigatório.'),
-  DB_PASSWORD: z.string().min(1, 'DB_PASSWORD é obrigatório.'),
-  DB_NAME: z.string().min(1, 'DB_NAME é obrigatório.'),
-  JWT_SECRET: z.string().min(16, 'JWT_SECRET deve ter pelo menos 16 caracteres.'),
+  DB_USER: requiredString('DB_USER'),
+  DB_PASSWORD: requiredString('DB_PASSWORD'),
+  DB_NAME: requiredString('DB_NAME'),
+  DB_SSL_ENABLED: z.enum(['true', 'false']).default('false'),
+  JWT_SECRET: z
+    .string({ required_error: 'JWT_SECRET é obrigatório.' })
+    .min(16, 'JWT_SECRET deve ter pelo menos 16 caracteres.'),
   JWT_EXPIRES_IN: z.string().default('1d'),
 });
 

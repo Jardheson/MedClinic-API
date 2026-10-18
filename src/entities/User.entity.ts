@@ -2,11 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserRole } from './UserRole.enum';
 
 @Entity('users')
+@Index('idx_users_email_unique', ['email'], { unique: true })
+@Index('idx_users_role', ['role'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
@@ -23,6 +26,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
+    enumName: 'user_role',
     default: UserRole.ATTENDANT,
     nullable: false,
   })
