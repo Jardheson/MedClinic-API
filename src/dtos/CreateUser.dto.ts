@@ -3,22 +3,19 @@ import { UserRole } from '../entities/UserRole.enum';
 
 export const CreateUserSchema = z.object({
   body: z.object({
-    nome: z
-      .string({ required_error: 'Nome é obrigatório.' })
-      .min(2, 'Nome deve ter pelo menos 2 caracteres.')
-      .max(150, 'Nome deve ter no máximo 150 caracteres.'),
+    name: z
+      .string({ required_error: 'name é obrigatório.' })
+      .min(2, 'name deve ter pelo menos 2 caracteres.')
+      .max(150, 'name deve ter no máximo 150 caracteres.'),
     email: z
-      .string({ required_error: 'E-mail é obrigatório.' })
-      .email('Formato de e-mail inválido.'),
-    senha: z
-      .string({ required_error: 'Senha é obrigatória.' })
-      .min(8, 'Senha deve ter pelo menos 8 caracteres.'),
-    role: z
-      .nativeEnum(UserRole, {
-        required_error: 'Perfil (role) é obrigatório.',
-        message: 'Perfil inválido. Use "administrador" ou "atendente".',
-      })
-      .default(UserRole.ATTENDANT),
+      .string({ required_error: 'email é obrigatório.' })
+      .email('email inválido.'),
+    password: z
+      .string({ required_error: 'password é obrigatório.' })
+      .min(8, 'password deve ter pelo menos 8 caracteres.'),
+    roles: z
+      .array(z.nativeEnum(UserRole), { required_error: 'roles é obrigatório.' })
+      .min(1, 'roles deve conter ao menos um perfil.'),
   }),
 });
 
