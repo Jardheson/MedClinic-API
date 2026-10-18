@@ -1,5 +1,16 @@
 import { DataSource } from 'typeorm';
 import { createAppDataSource } from '../../../src/database/data-source';
+import { MedClinicInit1720000000001 } from '../../../src/database/migrations/1720000000001-MedClinicInit';
+import { MedClinicClinicalModule1720000000002 } from '../../../src/database/migrations/1720000000002-MedClinicClinicalModule';
+import { MedClinicDoctorsModule1720000000003 } from '../../../src/database/migrations/1720000000003-MedClinicDoctorsModule';
+import { MedClinicSchedulingModule1720000000004 } from '../../../src/database/migrations/1720000000004-MedClinicSchedulingModule';
+
+const integrationMigrations = [
+  MedClinicInit1720000000001,
+  MedClinicClinicalModule1720000000002,
+  MedClinicDoctorsModule1720000000003,
+  MedClinicSchedulingModule1720000000004,
+];
 
 const integrationEnv = {
   host: process.env.TEST_DB_HOST,
@@ -24,6 +35,7 @@ export function createIntegrationDataSource(): DataSource {
     migrationsRun: false,
     logging: false,
     ssl: false,
+    migrations: integrationMigrations,
   });
 }
 
