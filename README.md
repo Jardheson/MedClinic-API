@@ -170,6 +170,44 @@ Arquivos incluídos:
   gate de 80% e roda `npm run build`. O relatório de cobertura é publicado como artefato.
 - `deploy.yml`: publica imagem Docker no GHCR em `push` para `main` e `workflow_dispatch`
 
+## Publicação na nuvem
+
+A API está publicada no Render (runtime Docker), com PostgreSQL gerenciado pelo próprio Render.
+O deploy usa o `Dockerfile` do projeto, e o `ENTRYPOINT` aplica migrations e seed antes de subir
+o servidor. A configuração do ambiente é feita no painel do serviço do Render, usando as
+mesmas variáveis exigidas pelo `validateEnv`.
+
+Variáveis configuradas no serviço:
+
+```dotenv
+NODE_ENV=production
+DB_HOST=<host interno do PostgreSQL do Render>
+DB_PORT=5432
+DB_USER=<usuario do PostgreSQL do Render>
+DB_PASSWORD=<senha do PostgreSQL do Render>
+DB_NAME=<database do PostgreSQL do Render>
+DB_SSL_ENABLED=false
+JWT_SECRET=<string com 16+ caracteres>
+JWT_EXPIRES_IN=1d
+RUN_ADMIN_SEED=true
+ADMIN_SEED_NAME=Administrador MedClinic
+ADMIN_SEED_EMAIL=admin@medclinic.local
+ADMIN_SEED_PASSWORD=<senha com 8+ caracteres>
+```
+
+As variáveis `DB_*` vêm da Internal Database URL do PostgreSQL do Render (conexão interna).
+
+- URL pública: `https://medclinic-api-f946.onrender.com`
+- Health check: `GET https://medclinic-api-f946.onrender.com/api/v1/health`
+
+```bash
+curl https://medclinic-api-f946.onrender.com/api/v1/health
+# {"status":"ok"}
+```
+
+Observação: no plano free o serviço hiberna após inatividade, então a primeira requisição
+pode levar alguns segundos (cold start).
+
 ## Endpoints principais
 
 ### Health
