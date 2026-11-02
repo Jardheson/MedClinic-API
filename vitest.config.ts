@@ -1,10 +1,13 @@
 import { defineConfig } from 'vitest/config';
 
+const runIntegrationTests = process.env.RUN_INTEGRATION_TESTS === 'true';
+
 export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
     include: ['tests/**/*.spec.ts'],
+    exclude: runIntegrationTests ? [] : ['tests/integration/**/*.spec.ts'],
     hookTimeout: 60000,
     testTimeout: 30000,
     coverage: {
@@ -17,6 +20,7 @@ export default defineConfig({
         'src/database/**',
         'src/@types/**',
         'src/scripts/**',
+        ...(runIntegrationTests ? [] : ['src/repositories/**']),
       ],
       thresholds: {
         lines: 80,
