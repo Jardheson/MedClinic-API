@@ -20,8 +20,12 @@ const integrationEnv = {
   database: process.env.TEST_DB_NAME,
 };
 
+function shouldRunIntegrationTests(): boolean {
+  return process.env.RUN_INTEGRATION_TESTS === 'true';
+}
+
 export function isIntegrationDatabaseConfigured(): boolean {
-  return Object.values(integrationEnv).every((value) => Boolean(value));
+  return shouldRunIntegrationTests() && Object.values(integrationEnv).every((value) => Boolean(value));
 }
 
 export function createIntegrationDataSource(): DataSource {

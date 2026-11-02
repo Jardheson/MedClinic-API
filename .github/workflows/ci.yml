@@ -40,6 +40,7 @@ jobs:
       TEST_DB_USER: postgres
       TEST_DB_PASSWORD: postgres
       TEST_DB_NAME: medclinic_test
+      RUN_INTEGRATION_TESTS: "true"
       JWT_SECRET: ci-secret-key-for-tests-1234567890
       JWT_EXPIRES_IN: 1d
 
