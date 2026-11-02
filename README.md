@@ -166,8 +166,9 @@ Arquivos incluídos:
 ## Workflows
 
 - `ci.yml`: roda em `push` e `pull_request`; sobe um PostgreSQL como service, cria o banco
-  `medclinic_test`, executa `npm run test:coverage` (suíte unificada, unit + integração) com
-  gate de 80% e roda `npm run build`. O relatório de cobertura é publicado como artefato.
+  `medclinic_test`, executa `RUN_INTEGRATION_TESTS=true npm run test:coverage` (suíte completa,
+  unit + integração) com gate de 80% e roda `npm run build`. O relatório de cobertura é
+  publicado como artefato.
 - `deploy.yml`: publica imagem Docker no GHCR em `push` para `main` e `workflow_dispatch`
 
 ## Publicação na nuvem
@@ -358,12 +359,13 @@ Body:
 
 ## Testes
 
-A suíte de cobertura é unificada: ela roda testes unitários/HTTP e os testes de integração
-com PostgreSQL real, e aplica o gate de cobertura sobre todo o `src`.
+A execução padrão (`npm test` e `npm run test:coverage`) roda apenas testes unitários/HTTP.
+Os testes de integração com PostgreSQL real ficam opt-in via `RUN_INTEGRATION_TESTS=true`.
 
 ```bash
-npm test              # suíte unificada (unit + integração)
-npm run test:coverage # suíte unificada + cobertura com gate de 80%
+npm test              # padrão: unitários/HTTP (sem integração)
+npm run test:coverage # padrão + cobertura com gate de 80%
+RUN_INTEGRATION_TESTS=true npm run test:coverage # suíte completa (unit + integração)
 npm run test:integration # apenas os testes de integração
 ```
 
@@ -385,8 +387,9 @@ thresholds: {
 }
 ```
 
-Escopo de cobertura: todo o `src`, exceto `src/server.ts`, `src/database/**`, `src/@types/**`
-e `src/scripts/**` (pontos de entrada de bootstrap/CLI, exercitados pelo entrypoint do container).
+Escopo de cobertura padrão: `src/**/*.ts`, com exclusão de `src/server.ts`, `src/database/**`,
+`src/@types/**`, `src/scripts/**` e `src/repositories/**`.
+Com `RUN_INTEGRATION_TESTS=true`, `src/repositories/**` volta para o escopo de cobertura.
 
 ## Integração
 
@@ -407,8 +410,8 @@ npm run test:integration
 ```
 
 Se estiver usando o `docker compose`, o banco `medclinic_test` já é criado automaticamente no mesmo
-Postgres. Quando as variáveis `TEST_DB_*` não estão configuradas, os testes de integração são
-ignorados e o gate de cobertura falha de forma explícita.
+Postgres. Para incluir integração na cobertura do comando `test:coverage`, rode com
+`RUN_INTEGRATION_TESTS=true`.
 
 ## Estrutura resumida
 
