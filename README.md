@@ -358,12 +358,13 @@ Body:
 
 ## Testes
 
-A suíte de cobertura é unificada: ela roda testes unitários/HTTP e os testes de integração
-com PostgreSQL real, e aplica o gate de cobertura sobre todo o `src`.
+A suíte padrão roda apenas os testes unitários/HTTP. Os testes de integração com PostgreSQL real
+só entram na execução quando `RUN_INTEGRATION_TESTS=true`.
 
 ```bash
-npm test              # suíte unificada (unit + integração)
-npm run test:coverage # suíte unificada + cobertura com gate de 80%
+npm test              # suíte padrão (unit + HTTP)
+npm run test:coverage # suíte padrão + cobertura com gate de 80%
+RUN_INTEGRATION_TESTS=true npm run test:coverage # suíte completa (unit + HTTP + integração)
 npm run test:integration # apenas os testes de integração
 ```
 
@@ -385,8 +386,9 @@ thresholds: {
 }
 ```
 
-Escopo de cobertura: todo o `src`, exceto `src/server.ts`, `src/database/**`, `src/@types/**`
-e `src/scripts/**` (pontos de entrada de bootstrap/CLI, exercitados pelo entrypoint do container).
+Escopo de cobertura (suíte padrão): todo o `src`, exceto `src/server.ts`, `src/database/**`,
+`src/@types/**`, `src/scripts/**` e `src/repositories/**`.
+Com `RUN_INTEGRATION_TESTS=true`, `src/repositories/**` volta a entrar no escopo.
 
 ## Integração
 
@@ -407,8 +409,8 @@ npm run test:integration
 ```
 
 Se estiver usando o `docker compose`, o banco `medclinic_test` já é criado automaticamente no mesmo
-Postgres. Quando as variáveis `TEST_DB_*` não estão configuradas, os testes de integração são
-ignorados e o gate de cobertura falha de forma explícita.
+Postgres. Para incluir integração na suíte principal com cobertura, rode
+`RUN_INTEGRATION_TESTS=true npm run test:coverage`.
 
 ## Estrutura resumida
 
