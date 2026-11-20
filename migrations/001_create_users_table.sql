@@ -14,11 +14,11 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 2. Cria o ENUM de perfil de usuário (contrato vigente da Etapa 2)
-DO $ BEGIN
+DO $$ BEGIN
     CREATE TYPE user_role AS ENUM ('admin', 'secretary');
 EXCEPTION
     WHEN duplicate_object THEN NULL;
-END $;
+END $$;
 
 -- 3. Cria a tabela de usuários
 CREATE TABLE IF NOT EXISTS users (

@@ -27,7 +27,7 @@ const envSchema = z.object({
   DB_SSL_ENABLED: z.enum(['true', 'false']).default('false'),
   JWT_SECRET: z
     .string({ required_error: 'JWT_SECRET é obrigatório.' })
-    .min(16, 'JWT_SECRET deve ter pelo menos 16 caracteres.'),
+    .min(32, 'JWT_SECRET deve ter pelo menos 32 caracteres.'),
   JWT_EXPIRES_IN: z.string().default('1d'),
 });
 
